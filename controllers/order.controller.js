@@ -1,5 +1,5 @@
-const Order = require('../models/Order');
-const asyncHandler = require('../utils/asyncHandler');
+const Order = require("../models/Order");
+const asyncHandler = require("../utils/asyncHandler");
 
 // ─── POST /api/orders ─────────────────────────────────────────────────────────
 // Mirrors OrderServiceImpl.placeOrder
@@ -9,8 +9,8 @@ const placeOrder = asyncHandler(async (req, res) => {
 
   if (!items || items.length === 0) {
     return res.status(400).json({
-      error: 'BAD_REQUEST',
-      message: 'Order must contain at least one item',
+      error: "BAD_REQUEST",
+      message: "Order must contain at least one item",
     });
   }
 
@@ -18,12 +18,12 @@ const placeOrder = asyncHandler(async (req, res) => {
     customerName,
     phone,
     address,
-    items,   // stored as proper subdocument array in MongoDB
+    items, // stored as proper subdocument array in MongoDB
     total,
-    status: 'PENDING',
+    status: "PENDING",
   });
 
-  res.status(200).json(order);
+  res.status(201).json(order);
 });
 
 // ─── GET /api/orders ──────────────────────────────────────────────────────────
@@ -37,7 +37,9 @@ const getAllOrders = asyncHandler(async (req, res) => {
 const getOrderById = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
   if (!order) {
-    return res.status(404).json({ error: 'NOT_FOUND', message: 'Order not found' });
+    return res
+      .status(404)
+      .json({ error: "NOT_FOUND", message: "Order not found" });
   }
   res.json(order);
 });
@@ -48,17 +50,19 @@ const getOrderById = asyncHandler(async (req, res) => {
 const updateOrderStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
 
-  const validStatuses = ['PENDING', 'CONFIRMED', 'DELIVERED', 'CANCELLED'];
+  const validStatuses = ["PENDING", "CONFIRMED", "DELIVERED", "CANCELLED"];
   if (!validStatuses.includes(status?.toUpperCase())) {
     return res.status(400).json({
-      error: 'BAD_REQUEST',
-      message: `Status must be one of: ${validStatuses.join(', ')}`,
+      error: "BAD_REQUEST",
+      message: `Status must be one of: ${validStatuses.join(", ")}`,
     });
   }
 
   const order = await Order.findById(req.params.id);
   if (!order) {
-    return res.status(404).json({ error: 'NOT_FOUND', message: 'Order not found' });
+    return res
+      .status(404)
+      .json({ error: "NOT_FOUND", message: "Order not found" });
   }
 
   order.status = status.toUpperCase();
@@ -71,7 +75,9 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 const deleteOrder = asyncHandler(async (req, res) => {
   const order = await Order.findByIdAndDelete(req.params.id);
   if (!order) {
-    return res.status(404).json({ error: 'NOT_FOUND', message: 'Order not found' });
+    return res
+      .status(404)
+      .json({ error: "NOT_FOUND", message: "Order not found" });
   }
   res.status(204).send();
 });
