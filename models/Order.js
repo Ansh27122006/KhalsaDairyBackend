@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // ─── OrderItem subdocument ────────────────────────────────────────────────────
 // In Spring Boot, items were serialised to a raw JSON string in SQL.
@@ -8,31 +8,36 @@ const orderItemSchema = new mongoose.Schema(
   {
     productId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
+      ref: "Product",
       required: true,
     },
     quantity: {
       type: Number,
       required: true,
-      min: [1, 'Quantity must be at least 1'],
+      min: [1, "Quantity must be at least 1"],
     },
   },
   { _id: false }
 );
 
 // ─── Order ────────────────────────────────────────────────────────────────────
-const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'DELIVERED', 'CANCELLED'];
+const ORDER_STATUSES = ["PENDING", "CONFIRMED", "DELIVERED", "CANCELLED"];
 
 const orderSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: false,
+    },
     customerName: {
       type: String,
-      required: [true, 'Customer name is required'],
+      required: [true, "Customer name is required"],
       trim: true,
     },
     phone: {
       type: String,
-      required: [true, 'Phone is required'],
+      required: [true, "Phone is required"],
       trim: true,
     },
     address: {
@@ -41,32 +46,33 @@ const orderSchema = new mongoose.Schema(
     },
     items: {
       type: [orderItemSchema],
-      required: [true, 'Order items are required'],
+      required: [true, "Order items are required"],
       validate: {
         validator: (arr) => arr.length > 0,
-        message: 'Order must have at least one item',
+        message: "Order must have at least one item",
       },
     },
     total: {
       type: Number,
-      required: [true, 'Total is required'],
-      min: [0, 'Total cannot be negative'],
+      required: [true, "Total is required"],
+      min: [0, "Total cannot be negative"],
     },
     status: {
       type: String,
       enum: ORDER_STATUSES,
-      default: 'PENDING',
+      default: "PENDING",
       uppercase: true,
     },
   },
   {
-    timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' },
+    timestamps: { createdAt: "createdAt", updatedAt: "updatedAt" },
   }
 );
 
 // Index for fast customer-order lookups (mirrors OrderRepository.findByPhone)
+orderSchema.index({ userId: 1 });
 orderSchema.index({ phone: 1 });
 orderSchema.index({ createdAt: -1 });
 orderSchema.index({ status: 1 });
 
-module.exports = mongoose.model('Order', orderSchema);
+module.exports = mongoose.model("Order", orderSchema);

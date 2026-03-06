@@ -1,12 +1,12 @@
-const express = require('express');
-const { protect, adminOnly } = require('../middleware/auth');
+const express = require("express");
+const { protect, adminOnly } = require("../middleware/auth");
 const {
   placeOrder,
   getAllOrders,
   getOrderById,
   updateOrderStatus,
   deleteOrder,
-} = require('../controllers/order.controller');
+} = require("../controllers/order.controller");
 
 const router = express.Router();
 
@@ -14,12 +14,12 @@ const router = express.Router();
 router.use(protect);
 
 // ── Customer-accessible ──────────────────────────────────────────────────────
-router.post('/', placeOrder);          // any logged-in user can place an order
-router.get('/:id', getOrderById);      // user can view a specific order
+router.post("/", placeOrder); // any logged-in user can place an order
+router.get("/:id", getOrderById); // user can view a specific order
+router.get("/", getAllOrders); // list ALL orders
 
 // ── Admin-only ───────────────────────────────────────────────────────────────
-router.get('/',          adminOnly, getAllOrders);        // list ALL orders
-router.put('/:id/status', adminOnly, updateOrderStatus); // change status
-router.delete('/:id',    adminOnly, deleteOrder);        // delete order
+router.put("/:id/status", adminOnly, updateOrderStatus); // change status
+router.delete("/:id", adminOnly, deleteOrder); // delete order
 
 module.exports = router;

@@ -15,6 +15,7 @@ const placeOrder = asyncHandler(async (req, res) => {
   }
 
   const order = await Order.create({
+    userId: req.user._id,
     customerName,
     phone,
     address,
@@ -29,7 +30,17 @@ const placeOrder = asyncHandler(async (req, res) => {
 // ─── GET /api/orders ──────────────────────────────────────────────────────────
 // Mirrors: findAllByOrderByCreatedAtDesc
 const getAllOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find().sort({ createdAt: -1 });
+  if (req.user.role === "admin") {
+    const orders = await Order.find().sort({ createdAt: -1 });
+    return res.json(orders);
+  }
+
+  // Regular user — only their own orders
+  // dual match handles old orders placed before userId was added
+  const orders = await Order.find({
+    $or: [{ userId: req.user._id }, { phone: req.user.phone }],
+  }).sort({ createdAt: -1 });
+
   res.json(orders);
 });
 
