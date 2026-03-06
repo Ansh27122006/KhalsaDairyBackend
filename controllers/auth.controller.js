@@ -110,4 +110,9 @@ const login = asyncHandler(async (req, res) => {
   res.status(200).json(buildAuthResponse(user, token, "Login successful"));
 });
 
-module.exports = { register, login };
+// ─── GET /api/auth/validate ───────────────────────────────────────────────────
+const validate = asyncHandler(async (req, res) => {
+  res.status(200).json(buildAuthResponse(req.user, null, "Token valid"));
+});
+
+module.exports = { register, login, validate };
